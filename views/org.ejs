@@ -1,0 +1,90 @@
+<%- include('partials/header') %>
+
+<h1>Organization Setup</h1>
+
+<div class="tabs">
+  <a href="/org?tab=departments" class="<%= tab === 'departments' ? 'active' : '' %>">Departments</a>
+  <a href="/org?tab=categories" class="<%= tab === 'categories' ? 'active' : '' %>">Asset Categories</a>
+  <a href="/org?tab=employees" class="<%= tab === 'employees' ? 'active' : '' %>">Employee Directory</a>
+</div>
+
+<% if (tab === 'departments') { %>
+  <h2>Departments</h2>
+  <form method="POST" action="/org/departments" class="inline-form">
+    <input type="text" name="name" placeholder="Department name" required>
+    <select name="parent_department_id">
+      <option value="">No parent</option>
+      <% departments.forEach(d => { %><option value="<%= d.id %>"><%= d.name %></option><% }) %>
+    </select>
+    <select name="head_employee_id">
+      <option value="">No head assigned yet</option>
+      <% employees.forEach(e => { %><option value="<%= e.id %>"><%= e.name %></option><% }) %>
+    </select>
+    <button type="submit">Add Department</button>
+  </form>
+  <table>
+    <tr><th>Name</th><th>Parent</th><th>Head</th><th>Status</th><th></th></tr>
+    <% departments.forEach(d => { %>
+      <tr>
+        <td><%= d.name %></td>
+        <td><%= departments.find(p => p.id === d.parent_department_id)?.name || '-' %></td>
+        <td><%= d.head_name || '-' %></td>
+        <td><%= d.status %></td>
+        <td>
+          <form method="POST" action="/org/departments/<%= d.id %>/status?_method=PUT" style="display:inline">
+            <input type="hidden" name="status" value="<%= d.status === 'Active' ? 'Inactive' : 'Active' %>">
+            <button type="submit" class="link-btn"><%= d.status === 'Active' ? 'Deactivate' : 'Activate' %></button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+<% } %>
+
+<% if (tab === 'categories') { %>
+  <h2>Asset Categories</h2>
+  <form method="POST" action="/org/categories" class="inline-form">
+    <input type="text" name="name" placeholder="Category name (e.g. Electronics)" required>
+    <button type="submit">Add Category</button>
+  </form>
+  <table>
+    <tr><th>Name</th></tr>
+    <% categories.forEach(c => { %><tr><td><%= c.name %></td></tr><% }) %>
+  </table>
+<% } %>
+
+<% if (tab === 'employees') { %>
+  <h2>Employee Directory</h2>
+  <p class="hint">This is the only place roles are assigned. Nobody can self-elevate their own role.</p>
+  <table>
+    <tr><th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+    <% employees.forEach(e => { %>
+      <tr>
+        <td><%= e.name %></td>
+        <td><%= e.email %></td>
+        <td><%= e.department_name || '-' %></td>
+        <td><%= e.role %></td>
+        <td><%= e.status %></td>
+        <td>
+          <form method="POST" action="/org/employees/<%= e.id %>/role?_method=PUT" style="display:inline">
+            <select name="role">
+              <option value="Employee" <%= e.role === 'Employee' ? 'selected' : '' %>>Employee</option>
+              <option value="DepartmentHead" <%= e.role === 'DepartmentHead' ? 'selected' : '' %>>Department Head</option>
+              <option value="AssetManager" <%= e.role === 'AssetManager' ? 'selected' : '' %>>Asset Manager</option>
+              <option value="Admin" <%= e.role === 'Admin' ? 'selected' : '' %>>Admin</option>
+            </select>
+            <select name="department_id">
+              <option value="">No department</option>
+              <% departments.forEach(d => { %>
+                <option value="<%= d.id %>" <%= e.department_id === d.id ? 'selected' : '' %>><%= d.name %></option>
+              <% }) %>
+            </select>
+            <button type="submit" class="link-btn">Update</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+<% } %>
+
+<%- include('partials/footer') %>

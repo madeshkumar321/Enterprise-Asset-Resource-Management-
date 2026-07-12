@@ -1,0 +1,70 @@
+<%- include('../partials/header') %>
+
+<h1><%= asset.asset_tag %> — <%= asset.name %></h1>
+<p>Status: <span class="status-badge status-<%= asset.status.replace(/\s+/g,'') %>"><%= asset.status %></span></p>
+
+<% if (typeof error !== 'undefined' && error === 'already_held') { %>
+  <div class="error-box">
+    This asset is currently held by <strong><%= holder %></strong>.
+    <form method="POST" action="/assets/<%= asset.id %>/transfer-request" class="inline-form">
+      <select name="to_employee_id" required>
+        <% employees.forEach(e => { %><option value="<%= e.id %>"><%= e.name %></option><% }) %>
+      </select>
+      <button type="submit">Request Transfer Instead</button>
+    </form>
+  </div>
+<% } %>
+<% if (typeof info !== 'undefined' && info === 'transfer_requested') { %>
+  <p class="success">Transfer request submitted.</p>
+<% } %>
+
+<% if (asset.status === 'Available') { %>
+  <h3>Allocate this asset</h3>
+  <form method="POST" action="/assets/<%= asset.id %>/allocate" class="inline-form">
+    <select name="employee_id" required>
+      <% employees.forEach(e => { %><option value="<%= e.id %>"><%= e.name %></option><% }) %>
+    </select>
+    <input type="date" name="expected_return_date">
+    <button type="submit">Allocate</button>
+  </form>
+<% } %>
+
+<% if (asset.status === 'Allocated') { %>
+  <h3>Return this asset</h3>
+  <form method="POST" action="/assets/<%= asset.id %>/return" class="inline-form">
+    <input type="text" name="return_condition_notes" placeholder="Condition notes on return">
+    <button type="submit">Mark Returned</button>
+  </form>
+<% } %>
+
+<% if (asset.is_bookable) { %>
+  <p><a href="/assets/<%= asset.id %>/bookings" class="btn">View / Make Bookings</a></p>
+<% } %>
+
+<h2>Allocation History</h2>
+<table>
+  <tr><th>Employee</th><th>Allocated</th><th>Returned</th><th>Status</th></tr>
+  <% allocationHistory.forEach(h => { %>
+    <tr>
+      <td><%= h.employee_name || h.department_name || '-' %></td>
+      <td><%= h.allocated_at.toISOString().split('T')[0] %></td>
+      <td><%= h.returned_at ? h.returned_at.toISOString().split('T')[0] : '-' %></td>
+      <td><%= h.status %></td>
+    </tr>
+  <% }) %>
+</table>
+
+<h2>Maintenance History</h2>
+<table>
+  <tr><th>Issue</th><th>Priority</th><th>Status</th><th>Raised</th></tr>
+  <% maintenanceHistory.forEach(m => { %>
+    <tr>
+      <td><%= m.issue_description %></td>
+      <td><%= m.priority %></td>
+      <td><%= m.status %></td>
+      <td><%= m.created_at.toISOString().split('T')[0] %></td>
+    </tr>
+  <% }) %>
+</table>
+
+<%- include('../partials/footer') %>

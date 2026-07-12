@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+
+<h1>Bookings — <%= asset.name %></h1>
+
+<% if (typeof error !== 'undefined' && error === 'overlap') { %>
+  <p class="error">That time slot overlaps with an existing booking. Please choose a different time.</p>
+<% } %>
+
+<h3>Book this resource</h3>
+<form method="POST" action="/assets/<%= asset.id %>/bookings" class="inline-form">
+  <label>Start</label>
+  <input type="datetime-local" name="start_time" required>
+  <label>End</label>
+  <input type="datetime-local" name="end_time" required>
+  <button type="submit">Book</button>
+</form>
+
+<h3>Upcoming / Ongoing Bookings</h3>
+<table>
+  <tr><th>Booked By</th><th>Start</th><th>End</th><th>Status</th><th></th></tr>
+  <% bookings.forEach(b => { %>
+    <tr>
+      <td><%= b.booked_by_name %></td>
+      <td><%= b.start_time.toLocaleString() %></td>
+      <td><%= b.end_time.toLocaleString() %></td>
+      <td><%= b.status %></td>
+      <td>
+        <form method="POST" action="/assets/bookings/<%= b.id %>/cancel?_method=PUT" style="display:inline">
+          <button type="submit" class="link-btn">Cancel</button>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+
+<%- include('../partials/footer') %>

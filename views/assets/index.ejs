@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+
+<h1>Asset Directory</h1>
+
+<form method="GET" action="/assets" class="inline-form">
+  <input type="text" name="search" placeholder="Search tag, name, serial..." value="<%= filters.search || '' %>">
+  <select name="category_id">
+    <option value="">All categories</option>
+    <% categories.forEach(c => { %>
+      <option value="<%= c.id %>" <%= filters.category_id == c.id ? 'selected' : '' %>><%= c.name %></option>
+    <% }) %>
+  </select>
+  <select name="status">
+    <option value="">All statuses</option>
+    <% ['Available','Allocated','Reserved','Under Maintenance','Lost','Retired','Disposed'].forEach(s => { %>
+      <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+    <% }) %>
+  </select>
+  <button type="submit">Filter</button>
+  <a href="/assets/new" class="btn">+ Register Asset</a>
+</form>
+
+<table>
+  <tr><th>Tag</th><th>Name</th><th>Category</th><th>Status</th><th>Held By</th><th>Location</th></tr>
+  <% assets.forEach(a => { %>
+    <tr>
+      <td><%= a.asset_tag %></td>
+      <td><a href="/assets/<%= a.id %>"><%= a.name %></a></td>
+      <td><%= a.category_name || '-' %></td>
+      <td><span class="status-badge status-<%= a.status.replace(/\s+/g,'') %>"><%= a.status %></span></td>
+      <td><%= a.current_holder || '-' %></td>
+      <td><%= a.location || '-' %></td>
+    </tr>
+  <% }) %>
+</table>
+
+<%- include('../partials/footer') %>

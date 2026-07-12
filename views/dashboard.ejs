@@ -1,0 +1,36 @@
+<%- include('partials/header') %>
+
+<h1>Dashboard</h1>
+
+<div class="kpi-grid">
+  <div class="kpi-card"><span class="kpi-number"><%= kpis.available %></span><span class="kpi-label">Assets Available</span></div>
+  <div class="kpi-card"><span class="kpi-number"><%= kpis.allocated %></span><span class="kpi-label">Assets Allocated</span></div>
+  <div class="kpi-card"><span class="kpi-number"><%= kpis.underMaintenance %></span><span class="kpi-label">Under Maintenance</span></div>
+  <div class="kpi-card"><span class="kpi-number"><%= kpis.activeBookings %></span><span class="kpi-label">Active Bookings</span></div>
+  <div class="kpi-card"><span class="kpi-number"><%= kpis.pendingTransfers %></span><span class="kpi-label">Pending Transfers</span></div>
+</div>
+
+<h2>Overdue Returns</h2>
+<% if (overdue.length === 0) { %>
+  <p class="hint">Nothing overdue right now.</p>
+<% } else { %>
+  <table>
+    <tr><th>Asset Tag</th><th>Name</th><th>Held By</th><th>Expected Return</th></tr>
+    <% overdue.forEach(o => { %>
+      <tr class="overdue-row">
+        <td><%= o.asset_tag %></td>
+        <td><a href="/assets/<%= o.id %>"><%= o.name %></a></td>
+        <td><%= o.holder_name %></td>
+        <td><%= o.expected_return_date.toISOString().split('T')[0] %></td>
+      </tr>
+    <% }) %>
+  </table>
+<% } %>
+
+<h2>Quick Actions</h2>
+<div class="quick-actions">
+  <a class="btn" href="/assets/new">+ Register Asset</a>
+  <a class="btn" href="/assets">Browse / Book Resources</a>
+</div>
+
+<%- include('partials/footer') %>

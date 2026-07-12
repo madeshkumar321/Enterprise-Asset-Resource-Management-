@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>AssetFlow</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <% if (currentUser) { %>
+  <nav class="navbar">
+    <div class="nav-brand">AssetFlow</div>
+    <div class="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/assets">Assets</a>
+      <% if (currentUser.role === 'Admin') { %>
+        <a href="/org">Organization Setup</a>
+      <% } %>
+      <span class="nav-user"><%= currentUser.name %> (<%= currentUser.role %>)</span>
+      <form action="/logout" method="POST" style="display:inline">
+        <button type="submit" class="link-btn">Logout</button>
+      </form>
+    </div>
+  </nav>
+  <% } %>
+  <main class="container">
